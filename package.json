@@ -1,0 +1,11 @@
+{
+  "name": "js13k_2016",
+  "version": "0.0.1",
+  "description": "game - an entry for 2016 js13k contest",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sergey Chernykh",
+  "license": "MIT"
+}
