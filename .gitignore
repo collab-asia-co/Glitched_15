@@ -1,5 +1,4 @@
-*.sublime-project
-*.sublime-workspace
 *.ini
 node_modules/
 misc/
+submission/
