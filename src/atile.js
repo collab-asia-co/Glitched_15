@@ -24,14 +24,17 @@ Tile.prototype.draw = function() {
     it.ctx.fill();
 
     it.ctx.font = it.font;
-    it.ctx.textAlign = 'center';
-    it.ctx.textBaseline = 'middle';
     it.ctx.strokeStyle = '#91AA9D';
     it.ctx.lineWidth = 1;
     it.ctx.strokeText(it.n, it.x + it.s / 2, it.y + it.s / 2);
 };
 
-Tile.prototype.move = function(dir) {
+Tile.prototype.update = function(dir, dt) {
     var m = this.moves[dir];
-    this[m[0]] += m[1] * (this.s + this.r);
+    var k = m[0] + '_init';
+    if ( dt === 0 ) {
+        this[k] = this[m[0]];
+    }else {
+        this[m[0]] = this[k] + m[1] * (this.s + this.r) * dt;
+    }
 };

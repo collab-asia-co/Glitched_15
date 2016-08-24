@@ -40,7 +40,7 @@ gulp.task('compile', ['clean'], function() {
         .pipe(uglify())
         .pipe(sourcemaps.write('.', {
             includeContent: false,
-            sourceRoot: '../src'
+            sourceRoot: './src'
         }))
         .pipe(gulp.dest("./dist"));
 });

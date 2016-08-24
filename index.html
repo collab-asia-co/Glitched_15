@@ -5,11 +5,41 @@
     <style media="screen">
         html, body {
             background-color: #91AA9D;
+            font: 18px sans-serif;
+            color: #193441;
+            margin: 0;
+            padding: 0;
+        }
+        .help-outer {
+            position: fixed;
+            z-index: 99999;
+            top: 0;
+            left: 0;
+            display: none;
+            width: 100%;
+            height: 100%;
+            background-color: #91AA9D;
+        }
+        .help-inner {
+            display: table-cell;
+            text-align: center;
+            width: 600px;
+            vertical-align: middle;
+        }
+        .info {
+            position: absolute;
+            z-index: 8888;
+            text-align: center;
+            color: #3E606F;
+            bottom: 25px;
+            width: 100%;
         }
     </style>
 </head>
 <body>
     <canvas></canvas>
+    <div class="help-outer"><div class="help-inner">HELP</div></div>
+    <div class="info">&laquo;ESC&raquo - help,  &laquo;SPACE&raquo - restart</div>
     <script src="dist/game.min.js"></script>
 </body>
 </html>

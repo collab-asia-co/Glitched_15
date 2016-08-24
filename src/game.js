@@ -1,11 +1,118 @@
 function Game() {
-    this.numbers = getNumbers();
-    var tiles = {};
-    this.numbers.forEach(function(n, i) {
-        tiles[n] = getCoords(i);
-    });
+    var tiles;
 
-    // isCompleted();
+    this.init = function() {
+        this.numbers = getNumbers();
+        tiles = {};
+        this.numbers.forEach(function(n, i) {
+            tiles[n] = getCoords(i);
+        });
+    };
+
+    this.move = function(dir, full) {
+        var hole = tiles['0'],
+            keys = Object.keys(tiles),
+            arr = [],
+            i = 0,
+            temp = 0,
+            tile, completed;
+        if (dir === 'up') {
+            if (hole.row === 3) {
+                return;
+            }
+            for (; i < 16; i++) {
+                tile = tiles[keys[i]];
+                if (tile.col === hole.col && tile.row > hole.row) {
+                    if (full) {
+                        tile.row -= 1;
+                        temp += 1;
+                        arr.push(keys[i]);
+                    } else {
+                        if (tile.row === hole.row + 1) {
+                            tile.row -= 1;
+                            temp += 1;
+                            arr.push(keys[i]);
+                            break;
+                        }
+                    }
+                }
+            }
+            hole.row += temp;
+        } else if (dir === 'down') {
+            if (hole.row === 0) {
+                return;
+            }
+            for (; i < 16; i++) {
+                tile = tiles[keys[i]];
+
+                if (tile.col === hole.col && tile.row < hole.row) {
+                    if (full) {
+                        tile.row += 1;
+                        temp -= 1;
+                        arr.push(keys[i]);
+                    } else {
+                        if (tile.row === hole.row - 1) {
+                            tile.row += 1;
+                            temp -= 1;
+                            arr.push(keys[i]);
+                            break;
+                        }
+                    }
+                }
+            }
+            hole.row += temp;
+        } else if (dir === 'left') {
+            if (hole.col === 3) {
+                return;
+            }
+            for (; i < 16; i++) {
+                tile = tiles[keys[i]];
+                if (tile.row === hole.row && tile.col > hole.col) {
+                    if (full) {
+                        tile.col -= 1;
+                        temp += 1;
+                        arr.push(keys[i]);
+                    } else {
+                        if (tile.col === hole.col + 1) {
+                            tile.col -= 1;
+                            temp += 1;
+                            arr.push(keys[i]);
+                            break;
+                        }
+                    }
+                }
+            }
+            hole.col += temp;
+        } else if (dir === 'right') {
+            if (hole.col === 0) {
+                return;
+            }
+            for (; i < 16; i++) {
+                tile = tiles[keys[i]];
+                if (tile.row === hole.row && tile.col < hole.col) {
+                    if (full) {
+                        tile.col += 1;
+                        temp -= 1;
+                        arr.push(keys[i]);
+                    } else {
+                        if (tile.col === hole.col - 1) {
+                            tile.col += 1;
+                            temp -= 1;
+                            arr.push(keys[i]);
+                            break;
+                        }
+                    }
+                }
+            }
+            hole.col += temp;
+        }
+        completed = isCompleted();
+        return {
+            move: dir,
+            arr: arr,
+            completed: completed
+        };
+    };
 
     this.checkLine = function(n) {
         return (tiles[n].col === tiles['0'].col) || (tiles[n].row === tiles['0'].row);
@@ -55,6 +162,8 @@ function Game() {
             });
             hole.col -= steps;
 
+        } else {
+            return;
         }
         var completed = isCompleted();
         return {
@@ -86,10 +195,8 @@ function Game() {
         pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
         nums = pool.sort(rndSort).concat(0);
 
-        var pool1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 13, 0];
-        console.log(isSolvable(pool1));
-
-        nums = pool1;
+        // var pool1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 13, 0];
+        // nums = pool1;
 
         if (!isSolvable(nums)) {
             temp = nums[0];

@@ -19,25 +19,29 @@
     };
 
     var canvas = document.querySelector('canvas');
+    var help = document.querySelector('.help-outer');
+    help.style.display = 'none';
     var ctx = canvas.getContext('2d');
     var p = new Props();
     var game = new Game();
-    var tiles = createTiles(game.numbers, p);
-    var timer = new Timer();
+    var timer = new Timer(ctx, p);
+    var tiles;
 
     canvas.width = canvas.height = p.size;
     canvas.style.marginLeft = p.marginLeft + 'px';
     canvas.style.marginTop = p.marginTop + 'px';
-    setEventListeners();
-    drawStage();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    window.addEventListener('keyup', onSpecKeyUp, false);
+    initGame();
 
     function createTiles(nums, p) {
         var arr = [],
             i = 0,
             x, y;
 
-        nums.forEach(function (n, i) {
-            if ( n ) {
+        nums.forEach(function(n, i) {
+            if (n) {
                 x = p.gap + (i % 4) * (p.tile + p.gap);
                 y = p.gap + (Math.floor(i / 4)) * (p.tile + p.gap);
                 arr[i] = new Tile(ctx, n.toString(), x, y, p.tile, p.gap);
@@ -54,20 +58,82 @@
         tiles.forEach(function(tile) {
             tile.draw();
         });
+        if (timer.stopped) {
+            timer.draw();
+        }
     }
 
     function setEventListeners() {
         canvas.addEventListener('mouseleave', onMouseLeave, false);
         canvas.addEventListener('click', onMouseClick, false);
         canvas.addEventListener('mousemove', onMouseMove, false);
+        window.addEventListener('keyup', onKeyUp, false);
     }
 
     function removeEventListeners() {
         canvas.removeEventListener('mouseleave', onMouseLeave);
         canvas.removeEventListener('click', onMouseClick);
         canvas.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('keyup', onKeyUp);
     }
 
+    function initGame() {
+        game.init();
+        timer.start();
+        tiles = createTiles(game.numbers, p);
+        setEventListeners();
+        drawStage();
+    }
+
+    function toggleHelp() {
+        var hidden = help.style.display === 'none';
+        help.style.display = (hidden) ? 'table' : 'none';
+    }
+
+    function move(dir, full) {
+        var data = game.move(dir, full);
+        if (data) {
+            updateStage(data);
+        }
+    }
+
+    function onSpecKeyUp(e) {
+        switch (e.keyCode) {
+            case 32:
+                initGame();
+                break;
+            case 27:
+                toggleHelp();
+        }
+    }
+
+    function onKeyUp(e) {
+        switch (e.keyCode) {
+            case 87:
+                move('up', true);
+                break;
+            case 38:
+                move('up');
+                break;
+            case 83:
+                move('down', true);
+                break;
+            case 40:
+                move('down');
+                break;
+            case 68:
+                move('right', true);
+                break;
+            case 39:
+                move('right');
+                break;
+            case 65:
+                move('left', true);
+                break;
+            case 37:
+                move('left');
+        }
+    }
 
     function onMouseLeave() {
         for (var i = 0; i < 15; i++) {
@@ -81,46 +147,76 @@
     function onMouseClick(e) {
         var mouse = getMousePosition(canvas, e);
         for (var i = 0; i < 15; i++) {
-            if ( pointInRect(mouse, tiles[i]) ) {
+            if (pointInRect(mouse, tiles[i])) {
                 var data = game.checkState(tiles[i].n);
-                if ( data.move ) {
-                    updateTiles(data);
-                    drawStage();
-                    if ( data.completed ) {
-                        removeEventListeners();
-                        for (var j = 0; j < 15; j++) {
-                            tiles[j].c = '#FCFFF5';
-                        }
-                        canvas.style.cursor = 'auto';
-                        timer.show();
-                    }
-                    drawStage();
+                if (data) {
+                    updateStage(data);
                 }
                 break;
             }
         }
     }
 
+    function updateStage(d) {
+        var arr = [];
+        tiles.forEach(function(tile) {
+            if (d.arr.indexOf(tile.n) !== -1) {
+                arr.push(tile);
+            }
+        });
+        var animTime = 160;
+        var startTime;
+        var rAF = requestAnimationFrame(animateStage);
+
+        function animateStage(time) {
+            startTime = startTime || time;
+            var dT = (time - startTime)/animTime;
+            if ( dT >= 1 ) {
+                arr.forEach(function(tile) {
+                    tile.update(d.move, 1);
+                });
+                cancelAnimationFrame(rAF);
+                if (d.completed) {
+                    onComplete();
+                }
+                drawStage();
+            }else {
+                arr.forEach(function(tile) {
+                    tile.update(d.move, dT);
+                    tile.c = '#193441';
+                });
+                drawStage();
+                rAF = requestAnimationFrame(animateStage);
+            }
+
+        }
+    }
+
+    function onComplete() {
+        removeEventListeners();
+        for (var j = 0; j < 15; j++) {
+            tiles[j].c = '#FCFFF5';
+        }
+        canvas.style.cursor = 'auto';
+        timer.stop();
+    }
+
     function updateTiles(d) {
         tiles.forEach(function(tile) {
-            if ( d.arr.indexOf(tile.n) !== -1 ) {
+            if (d.arr.indexOf(tile.n) !== -1) {
                 tile.move(d.move);
             }
         });
-    }
-
-    function setMovedStyles(i) {
-        drawStage();
     }
 
     function onMouseMove(e) {
         var mouse = getMousePosition(canvas, e);
         var cursor = 'auto';
         for (var i = 0; i < 15; i++) {
-            if ( pointInRect(mouse, tiles[i]) && game.checkLine(tiles[i].n)) {
+            if (pointInRect(mouse, tiles[i]) && game.checkLine(tiles[i].n)) {
                 tiles[i].c = '#3E606F';
                 cursor = 'pointer';
-            }else  {
+            } else {
                 tiles[i].c = '#193441';
             }
         }
@@ -136,12 +232,11 @@
         };
     }
 
-    function pointInRect (point, rect) {
+    function pointInRect(point, rect) {
         return inRange(point.x, rect.x, rect.x + rect.s) && inRange(point.y, rect.y, rect.y + rect.s);
     }
 
-    function inRange (value, min, max) {
+    function inRange(value, min, max) {
         return value >= Math.min(min, max) && value <= Math.max(min, max);
     }
 })();
-// FCFFF5 D1DBBD 91AA9D 3E606F 193441
