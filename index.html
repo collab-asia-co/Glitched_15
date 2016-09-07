@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Game</title>
     <style media="screen">
-        html, body {
+        html,
+        body {
             background-color: #91AA9D;
             font: 18px sans-serif;
             color: #193441;
@@ -22,24 +24,33 @@
         }
         .help-inner {
             display: table-cell;
-            text-align: center;
-            width: 600px;
             vertical-align: middle;
         }
-        .info {
-            position: absolute;
-            z-index: 8888;
-            text-align: center;
-            color: #3E606F;
-            bottom: 25px;
-            width: 100%;
+        .help-content {
+            max-width: 450px;
+            margin: 0 auto;
         }
     </style>
 </head>
+
 <body>
     <canvas></canvas>
-    <div class="help-outer"><div class="help-inner">HELP</div></div>
-    <div class="info">&laquo;ESC&raquo - help,  &laquo;SPACE&raquo - restart</div>
+    <div class="help-outer">
+        <div class="help-inner">
+            <div class="help-content">
+                <p>Your goal is to reposition the tiles in ascending order from 1 (the top left corner) to 15 counting left to right. The hole has to be in the bottom right corner.</p>
+                <p>You can move the tiles in the following ways:</p>
+                <ul>
+                    <li>using the arrow keys. This moves just one tile</li>
+                    <li>using WASD. That moves the whole row/column</li>
+                    <li>by clicking/tapping  an appropriate tile</li>
+                </ul>
+                <p>To get back to the game use 	&laquo;ESC&raquo; and to reset the game use &laquo;SPACE&raquo;</p>
+                <p><strong>Good luck! The clock is ticking!</strong></p>
+            </div>
+        </div>
+    </div>
     <script src="dist/game.min.js"></script>
 </body>
+
 </html>

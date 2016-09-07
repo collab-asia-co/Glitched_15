@@ -25,6 +25,7 @@
     var p = new Props();
     var game = new Game();
     var timer = new Timer(ctx, p);
+    var glitch = new Glitch(ctx, p);
     var tiles;
 
     canvas.width = canvas.height = p.size;
@@ -33,6 +34,7 @@
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     window.addEventListener('keyup', onSpecKeyUp, false);
+    window.addEventListener('resize', onResize, false);
     initGame();
 
     function createTiles(nums, p) {
@@ -52,9 +54,6 @@
 
     function drawStage() {
         ctx.clearRect(0, 0, p.size, p.size);
-        ctx.strokeStyle = '#193441';
-        ctx.lineWidth = 6;
-        ctx.strokeRect(0, 0, p.size, p.size);
         tiles.forEach(function(tile) {
             tile.draw();
         });
@@ -95,6 +94,25 @@
         if (data) {
             updateStage(data);
         }
+    }
+
+    function onResize() {
+        p = new Props();
+        canvas.width = canvas.height = p.size;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        canvas.style.marginLeft = p.marginLeft + 'px';
+        canvas.style.marginTop = p.marginTop + 'px';
+        game.numbers.forEach(function(n, i) {
+            var gtile = game.tiles[n];
+            var x, y;
+            if (n) {
+                x = p.gap + gtile.col * (p.tile + p.gap);
+                y = p.gap + gtile.row * (p.tile + p.gap);
+                tiles[i] = new Tile(ctx, n.toString(), x, y, p.tile, p.gap);
+            }
+        });
+        drawStage();
     }
 
     function onSpecKeyUp(e) {
@@ -143,7 +161,6 @@
         drawStage();
     }
 
-
     function onMouseClick(e) {
         var mouse = getMousePosition(canvas, e);
         for (var i = 0; i < 15; i++) {
@@ -170,8 +187,8 @@
 
         function animateStage(time) {
             startTime = startTime || time;
-            var dT = (time - startTime)/animTime;
-            if ( dT >= 1 ) {
+            var dT = (time - startTime) / animTime;
+            if (dT >= 1) {
                 arr.forEach(function(tile) {
                     tile.update(d.move, 1);
                 });
@@ -180,7 +197,8 @@
                     onComplete();
                 }
                 drawStage();
-            }else {
+                initGlitch();
+            } else {
                 arr.forEach(function(tile) {
                     tile.update(d.move, dT);
                     tile.c = '#193441';
@@ -189,6 +207,13 @@
                 rAF = requestAnimationFrame(animateStage);
             }
 
+        }
+    }
+
+    function initGlitch() {
+        if (Math.random() > 0.9) {
+            removeEventListeners();
+            glitch.draw(setEventListeners);
         }
     }
 

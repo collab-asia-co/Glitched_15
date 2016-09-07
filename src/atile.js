@@ -32,9 +32,9 @@ Tile.prototype.draw = function() {
 Tile.prototype.update = function(dir, dt) {
     var m = this.moves[dir];
     var k = m[0] + '_init';
-    if ( dt === 0 ) {
+    if (dt === 0) {
         this[k] = this[m[0]];
-    }else {
+    } else {
         this[m[0]] = this[k] + m[1] * (this.s + this.r) * dt;
     }
 };

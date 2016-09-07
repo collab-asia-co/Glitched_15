@@ -7,6 +7,7 @@ function Game() {
         this.numbers.forEach(function(n, i) {
             tiles[n] = getCoords(i);
         });
+        this.tiles = tiles;
     };
 
     this.move = function(dir, full) {
